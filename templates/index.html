@@ -1,0 +1,101 @@
+    <!--<link rel="stylesheet" href="/static/lib/editor/editor.css">-->
+    <!--<link rel="stylesheet" href="/static/lib/webuploader/webuploader.css">-->
+    <!--<script src="/static/lib/jquery-3.0.0.min.js"></script>-->
+    <!--<script src="/static/lib/markdownit.js"></script>-->
+    <!--<script src="/static/lib/webuploader/webuploader.withoutimage.js"></script>-->
+    <!--<script src="/static/lib/editor/editor.js"></script>-->
+    <!--<script src="/static/lib/editor/ext.js"></script>-->
+
+{% extends "base.html" %}
+{% block title %} bbs club {% endblock %}
+{% block main %}
+    <div id="main">
+        <div id="sidebar">
+            {% if u.is_guest() %}
+                <div class='panel'>
+                <div class='inner'>
+                    <div>
+                        您可以
+                    <a href='/user/login/view'>登录</a>
+                        或
+                    <a href='/user/register/view'>注册</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+                <div class='panel'>
+                <div class='header'>
+                  <span class='col_fade'>个人信息</span>
+                </div>
+                <div class='inner'>
+                    <div class='user_card'>
+                        <div>
+                            <a class='user_avatar' href="{{ url_for('user.user_detail',id=u.id) }}">
+                                <img src="{{ u.avatar }}" title="{{ u.username }}"/>
+                            </a>
+                            <span class='user_name'><a class='dark' href="{{ url_for('user.user_detail',id=u.id) }}">{{ u.username }}</a></span>
+                            <div class='board clearfix'>
+                                <div class='floor'>
+                                <span class='big'></span>
+                                </div>
+                            </div>
+                            <div class="space clearfix"></div>
+                            <span class="signature">
+                                “
+
+                                    {{ u.signature}}
+
+                                ”
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="panel">
+                <div class="inner">
+                    <a href="{{ url_for('topic.new', board_id=board_id) }}" class="create_topic_btn">
+                        <span class="span-success">发布话题xxxxxxxxxxxxxxxx</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div id="content">
+            <div class="panel">
+                <div class="header">
+                    {% if board_id == -1 %}
+                        <!--判断all版块是否被点击，被点击设置为current-tab-->
+                        <a href="/" class="topic-tab current-tab"> all </a>
+                    {% else %}
+                        <a href="/" class="topic-tab"> all </a>
+                    {% endif %}
+
+                    {% for b in bs %}
+                        {% if b.id == board_id %}
+                            <a href="/?board_id={{ b.id }}" class="topic-tab current-tab" > {{ b.title }} </a>
+                        {% else %}
+                            <a href="/?board_id={{ b.id }}" class="topic-tab" > {{ b.title }} </a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div class="inner post">
+                    <div class="topic_list">
+                        {% for t in ts %}
+                        <div class="cell">
+                            <div class="topic_title_wrapper">
+                                <a class="topic_title" href="{{ url_for('topic.detail', id=t.id) }}">
+                                    {{ t.title }}
+                                </a>
+                                <span>{{ t.replies() | count }} / {{ t.views }}</span>
+                                {# <span>{{ t.reply_count() }} / {{ t.views }}</span> #}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+<!--<script src="/static/js/test.js"></script>-->

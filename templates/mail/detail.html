@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %} 邮件详情 {% endblock %}
+{% block main %}
+<div id="main">
+    <div id="sidebar">
+        <div class='panel'>
+            <div class='header'>
+                <span class='col_fade'>个人信息</span>
+            </div>
+            <div class='inner'>
+                <div class='user_card'>
+                    <div>
+                        <a class='user_avatar' href="{{ url_for('user.user_detail',id=u.id) }}">
+                            <img src="{{ u.avatar }}" title="{{ u.username }}"/>
+                        </a>
+                        <span class='user_name'><a class='dark' href="{{ url_for('user.user_detail',id=u.id) }}">{{ u.username }}</a></span>
+                            <div class='board clearfix'>
+                                <div class='floor'><span class='big'></span>
+                                </div>
+                            </div>
+                        <div class="space clearfix"></div>
+                            <span class="signature">
+                                “
+
+                                {{ u.signature }}
+
+                                ”
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="inner">
+                    <a href="{{ url_for('topic.new') }}" class="create_topic_btn">
+                        <span class="span-success">发布话题xxxxxxxxxxxxxxxx</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    <div id="content">
+        <!--<div class="panel">-->
+            <!--<div class="changes">-->
+                <div class="mail_cell">
+                    {% set sender=User.one(id=m.sender_id) %}
+                    {% set receiver=User.one(id=m.receiver_id) %}
+                    <h3>邮件标题: {{ m.title }}</h3>
+                    <h3>发件人: {{ sender.username }}</h3>
+                    <h3>收件人: {{ receiver.username }}</h3>
+                    <h3>邮件内容: {{ m.content }}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

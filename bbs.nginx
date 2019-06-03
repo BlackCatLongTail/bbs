@@ -1,0 +1,15 @@
+server {
+    listen 80;
+
+    location / {
+        proxy_pass http://localhost:2000;
+    }
+
+    location /static {
+        alias /var/www/bbs/static;
+    }
+
+    location /avatar {
+        alias /var/www/bbs/avatars;
+    }
+}

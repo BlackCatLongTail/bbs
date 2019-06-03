@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %} 用户主页 {% endblock %}
+
+{% block main %}
+    <div id="main">
+        <div id="sidebar">
+            {% if current_u.is_guest() %}
+                <div class='panel'>
+                <div class='inner'>
+                    <div>
+                        您可以
+                    <a href='/user/login/view'>登录</a>
+                        或
+                    <a href='/user/register/view'>注册</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+                <div class='panel'>
+                <div class='header'>
+                  <span class='col_fade'>个人信息</span>
+                </div>
+                <div class='inner'>
+                    <div class='user_card'>
+                        <div>
+                            <a class='user_avatar' href="{{ url_for('user.user_detail',id=current_u.id) }}">
+                                <img src="{{ current_u.avatar }}" title="{{ current_u.username }}"/>
+                            </a>
+                            <span class='user_name'><a class='dark' href="{{ url_for('user.user_detail',id=current_u.id) }}">{{ current_u.username }}</a></span>
+                            <div class='board clearfix'>
+                                <div class='floor'>
+                                <span class='big'></span>
+                                </div>
+                            </div>
+                            <div class="space clearfix"></div>
+                            <span class="signature">
+                                “
+
+                                    {{ current_u.signature}}
+
+                                ”
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="panel">
+                <div class="inner">
+                    <a href="{{ url_for('topic.new') }}" class="create_topic_btn">
+                        <span class="span-success">发布话题xxxxxxxxxxxxxxxx</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div id="content">
+            <div class="panel">
+                <div class='header'>
+                    <ul class='breadcrumb'>
+                        <li><a href='/'>主页</a><span class='divider'>/</span></li>
+                    </ul>
+                </div>
+                <div class='inner userinfo'>
+                    <div class='user_big_avatar'>
+                        <img src="{{ author.avatar }}" class="user_avatar" title="{{ author.username }}"/>
+                    </div>
+                    <a class='dark'>{{ author.username }}</a>
+                    <div class="user_profile">
+                    </div>
+                    <p class='col_fade'>注册时间 {{ trans_time(author.created_time) }}</p>
+                </div>
+            </div>
+            <div class="panel">
+                <div class='header'>
+                    <span class='col_fade'>最近创建的话题</span>
+                </div>
+                <div class="topic_list">
+                    {% for t in created_topics %}
+                    {% set rs=t.replies() %}
+                    <div class='cell'>
+                        <a class="user_avatar pull-left" href="{{url_for('user.user_detail',id=author.id)}}">
+                            <img src="{{ author.avatar }}"
+                            title="{{ author.username }}"/>
+                        </a>
+                        <span class="reply_count pull-left">
+                            <span class="count_of_replies" title="回复数">
+                                {{ t.replies() | count }}
+                            </span>
+                            <span class="count_seperator">/</span>
+                            <span class="count_of_visits" title='点击数'>
+                                {{ t.views }}
+                            </span>
+                        </span>
+                        {% if rs|length>=1 %}
+                            {% set r=Reply.recently_reply(rs) %}
+                            {% set reply_u=User.one(id=r.user_id) %}
+                            <a class='last_time pull-right' href="{{ url_for('topic.detail', id=t.id) }}">
+                                <img class="user_small_avatar" src="{{ reply_u.avatar }}">
+                                <span class="last_active_time">回帖时间 {{ trans_time(r.updated_time) }}</span>
+                            </a>
+                        {% else %}
+                        {% endif %}
+                        <div class="topic_title_wrapper">
+                            <a class='topic_title' href="{{ url_for('topic.detail', id=t.id) }}" title="{{ t.title }}">
+                                {{ t.title }}
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="panel">
+                <div class='header'>
+                    <span class='col_fade'>最近参与的话题</span>
+                </div>
+                <div class="topic_list">
+                    {% for t in replied_topics %}
+                    {% set rs=t.replies() %}
+                    {% set topic_owner=User.one(id=t.user_id) %}
+                    <div class='cell'>
+                        <a class="user_avatar pull-left" href="{{ url_for('user.user_detail', id=topic_owner.id) }}">
+                            <img src="{{ topic_owner.avatar }}"
+                            title="{{ topic_owner.username }}"/>
+                        </a>
+                        <span class="reply_count pull-left">
+                            <span class="count_of_replies" title="回复数">
+                                {{ t.replies() | count }}
+                            </span>
+                            <span class="count_seperator">/</span>
+                            <span class="count_of_visits" title='点击数'>
+                                {{ t.views }}
+                            </span>
+                        </span>
+                        {% if rs|length>=1 %}
+                            {% set r=Reply.recently_reply(rs) %}
+                            {% set reply_u=User.one(id=r.user_id) %}
+                            <a class='last_time pull-right' href="{{ url_for('topic.detail', id=t.id) }}">
+                                <img class="user_small_avatar" src="{{ reply_u.avatar }}">
+                                <span class="last_active_time">回帖时间 {{ trans_time(r.updated_time) }}</span>
+                            </a>
+                        {% else %}
+                        {% endif %}
+                        <div class="topic_title_wrapper">
+                            <a class='topic_title' href="{{ url_for('topic.detail', id=t.id) }}" title="{{ t.title }}">
+                                {{ t.title }}
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

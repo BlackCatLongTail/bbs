@@ -1,0 +1,269 @@
+    <!--<link rel="stylesheet" href="/static/css/bootstrap.min.css">-->
+    <!--<link rel="stylesheet" href="/static/css/style.css">-->
+
+    <!--<link rel="stylesheet" href="/static/lib/webuploader/webuploader.css">-->
+    <!--<script src="/static/lib/jquery-3.0.0.min.js"></script>-->
+    <!--<script src="/static/lib/markdownit.js"></script>-->
+    <!--<script src="/static/lib/webuploader/webuploader.withoutimage.js"></script>-->
+    <!--<script src="/static/lib/editor/editor.js"></script>-->
+    <!--<script src="/static/lib/editor/ext.js"></script>-->
+{% extends "base.html" %}
+{% block title %} 帖子详情 {% endblock %}
+
+{% block main %}
+    <div id="main">
+        <div id="sidebar">
+            {% if u.is_guest() %}
+                <div class='panel'>
+                <div class='inner'>
+                    <div>
+                        您可以
+                    <a href='/user/login/view'>登录</a>
+                        或
+                    <a href='/user/register/view'>注册</a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+                <div class='panel'>
+                <div class='header'>
+                  <span class='col_fade'>个人信息</span>
+                </div>
+                <div class='inner'>
+                    <div class='user_card'>
+                        <div>
+                            <a class='user_avatar' href="{{ url_for('user.user_detail',id=u.id) }}">
+                                <img src="{{ u.avatar }}" title="{{ u.username }}"/>
+                            </a>
+                            <span class='user_name'><a class='dark' href="{{ url_for('user.user_detail',id=u.id) }}">{{ u.username }}</a></span>
+                            <div class='board clearfix'>
+                                <div class='floor'>
+                                <span class='big'></span>
+                                </div>
+                            </div>
+                            <div class="space clearfix"></div>
+                            <span class="signature">
+                                “
+
+                                    {{ u.signature}}
+
+                                ”
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <div class="panel">
+                <div class="inner">
+                    <a href="{{ url_for('topic.new') }}" class="create_topic_btn">
+                        <span class="span-success">发布话题xxxxxxxxxxxxxxxx</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    <div id="content">
+        <div class='panel'>
+            <div class='header topic_header'>
+                <span class="topic_full_title">
+                    {{ topic.title }}
+                </span>
+                <div class="changes">
+                    <span>
+                        发布于
+                        {{ ct.tm_year}}年{{ ct.tm_mon }}月{{ ct.tm_mday }}日
+                    </span>
+                    <span>
+                        作者
+                        <!--<a href="/user/{{ topic.user().id }}"> {{ topic.user().username }} </a>-->
+                        <a href="{{ url_for('user.user_detail',id=topic.user().id) }}"> {{ topic.user().username }} </a>
+                    </span>
+                    <span>
+                        {{ topic.views }} 次浏览
+                    </span>
+                    <span>
+                        来自 问答
+                    </span>
+                    <span>
+                        <a href="{{ url_for('topic.delete',id=topic.id,csrf_token=csrf_token) }}"> 删除帖子 </a>
+                    </span>
+                </div>
+            </div>
+            <div class='inner topic'>
+                <div class='topic_content'>
+                    <div class="markdown-text">{{ topic.content | safe }}</div>
+                </div>
+            </div>
+        </div>
+        <div class='panel'>
+            <div class='header'>
+                <span class='col_fade'>
+                    <!-- 过滤器 -->
+                    {{ topic.replies() | count }} 回复
+                </span>
+            </div>
+            {% for r in topic.replies() %}
+            {% set u = r.user() %}
+            <div class='cell reply_area reply_item'>
+                <div class='author_content'>
+                    <a href="{{ url_for('user.user_detail',id=u.id) }}" class="user_avatar">
+                        <img src="{{ u.avatar }}" title="avatar"/>
+                    </a>
+                    <div class='user_info'>
+                    <a class='dark reply_author'>
+                        {{ u.username }}
+                    </a>
+                    <a class="reply_time">
+                        {{ loop.index }}楼 / {{ loop.length }}楼 •
+                        <span class="reply_created_time" data-created_time="{{ r.created_time }}"></span>
+                    </a>
+                    <span>
+                        <a href="{{ url_for('reply.delete',id=r.id,csrf_token=csrf_token) }}"> 删除回复 </a>
+                    </span>
+
+                </div>
+                    <div class='user_action'>
+                        <span>
+                            <i class="fa up_btn
+                              fa-thumbs-o-up
+                              invisible" title="喜欢"></i>
+                            <span class="up-count">
+                            </span>
+                        </span>
+                </div>
+                </div>
+
+                <div class='reply_content from-leiwei1991'>
+                    <div class="markdown-text">{{ r.content|safe }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class='panel'>
+            <div class='header'>
+                <span class='col_fade'>添加回复</span>
+            </div>
+            <div class='inner reply'>
+                <form id='reply_form' action="{{ url_for('reply.add') }}" method='post'>
+                    <div class='markdown_editor in_editor'>
+                        <div class='markdown_in_editor'>
+                            <textarea class='editor' name='content' rows='5'></textarea>
+                            <div class='editor_buttons'>
+                                <input class='span-primary submit_btn' type="submit" data-loading-text="回复中.." value="回复" >
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="topic_id" value="{{ topic.id }}">
+                    <!--<input type='hidden' name='_csrf' id="_csrf" value='7foAXQNk-NOgVm8u3-0_TN2MSPLYO8WLlnhw'/>-->
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.bootcss.com/marked/0.3.19/marked.min.js"></script>
+<script src="https://cdn.bootcss.com/prism/1.13.0/prism.js"></script>
+<script src="https://cdn.bootcss.com/prism/1.13.0/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+    var e = function (sel) {
+        return document.querySelector(sel)
+    }
+
+    var es = function (sel) {
+        return document.querySelectorAll(sel)
+    }
+
+    var markContents = function () {
+        // markdown -> html 的处理放在高亮前面
+        // 因为高亮是针对 html 格式的
+        // lang -> language 不需要转 prism 自动转了
+        var contentDivs = es('.markdown-text')
+        for (var i = 0; i < contentDivs.length; i++) {
+            var contentDiv = contentDivs[i]
+            console.log('pre marked', contentDiv.textContent, contentDiv.innerHTML)
+            var content = marked(contentDiv.textContent)
+            console.log('after marked', content)
+            contentDiv.innerHTML = content
+        }
+    }
+
+    var highlight = function() {
+         // 自动加载对应的语言 不然要手动加入各个语言的 js
+        Prism.plugins.autoloader.languages_path = 'https://cdn.bootcss.com/prism/1.13.0/components/'
+    }
+
+    var year_month_day = function (second) {
+        var year = Math.floor(second/(3600 * 24 * 30 * 12))
+        console.log('year_month_day', year, second/(3600 * 24 * 30 * 12), second)
+
+        var month = Math.floor(second/(3600 * 24 * 30))
+        var day = Math.floor(second/(3600 * 24))
+        var hour = Math.floor(second/3600)
+        var minute = Math.floor(second/60)
+
+        if (year >= 1 ){
+            return `${year} 年前`;
+            }
+        else{
+            if (month >= 1){
+                return `${month}月前`;
+                }
+            else{
+                if (day >= 1){
+                    return `${day}日前`;
+                    }
+                else{
+                    if (hour >= 1){
+                        return `${hour}时前`;
+                        }
+                    else{
+                        if (minute >= 1){
+                            return `${minute}分钟前`;
+                            }
+                        else{
+                            return `${second}秒前`;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    var registerTimer = function () {
+        setInterval(function () {
+            var times = es('.reply_created_time')
+            for (var i = 0; i < times.length; i++) {
+                var t = times[i]
+                var time = Number(t.dataset.created_time)
+                var now = Math.floor(new Date() / 1000)
+                var delta = year_month_day(now - time)
+                t.innerText = delta
+            }
+        }, 1000)
+    }
+
+    <!--var registerTimer = function () {-->
+        <!--setInterval(function () {-->
+            <!--var times = es('.reply_created_time')-->
+            <!--for (var i = 0; i < times.length; i++) {-->
+                <!--var t = times[i]-->
+                <!--var time = Number(t.dataset.created_time)-->
+                <!--var now = Math.floor(new Date() / 1000)-->
+                <!--var delta = now - time-->
+                <!--var s = `${delta} 秒前`-->
+                <!--t.innerText = s-->
+            <!--}-->
+        <!--}, 1000)-->
+    <!--}-->
+
+    var __main = function () {
+        markContents()
+        highlight()
+        registerTimer()
+    }
+
+    __main()
+
+</script>
+{% endblock %}
+
+
