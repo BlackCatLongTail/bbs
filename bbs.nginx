@@ -1,6 +1,14 @@
 server {
     listen 80;
 
+    server_name 152.136.158.137;
+
+    root /home/bbs/public;
+
+    client_max_body_size 4G;
+
+    keepalive_timeout 10;
+
     location / {
         proxy_pass http://localhost:2000;
     }
